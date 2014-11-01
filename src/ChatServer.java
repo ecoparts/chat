@@ -9,5 +9,5 @@ public interface ChatServer extends Remote {
 
 	public ChatProxy subscribeUser(String nickname,ClientProxy handle) throws RemoteException;
 
-	public boolean unsubscribeUser(ClientProxy handle) throws RemoteException;
+	public boolean unsubscribeUser(ChatProxy handle) throws RemoteException;
 }

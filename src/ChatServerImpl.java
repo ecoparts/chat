@@ -3,6 +3,7 @@
  */
 
 import java.net.InetAddress;
+import java.rmi.ConnectIOException;
 import java.rmi.RemoteException;
 import java.rmi.Naming;
 import java.rmi.server.UnicastRemoteObject;
@@ -16,7 +17,7 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
 
 	public ChatServerImpl() throws RemoteException {
 		// Default ctor overloaded to catch RemoteException
-		System.out.println("TimeServerImpl created...");
+		System.out.println("ChatServer started...");
 	}
 
 	public long getTime() throws RemoteException {
@@ -28,29 +29,29 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
 	public ChatProxy subscribeUser(String nickname, ClientProxy handle)
 			throws RemoteException {
 
-		System.out.println("create session: ");
+		System.out.println(nickname + " hat sich angemeldet!");
 		ChatProxy s = new ChatProxyImpl(this, nickname, handle);
 		users.add(s);
 		return s;
 	}
 
-	@Override
-	public boolean unsubscribeUser(ClientProxy handle) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean unsubscribeUser(ChatProxy handle) throws RemoteException {
+		users.remove(handle);
+		return true;
 	}
+	
 
-	public void postMessage(String message, ChatProxyImpl s) {
+	public void postMessage(String message, ChatProxyImpl s) throws RemoteException {
 		ChatProxyImpl tmp;
 		for (int i = 0; i < users.size(); i++) {
 			tmp = (ChatProxyImpl) users.get(i);
 			try {
 				tmp.getClientHandle().receiveMessage(s.getNickname(), message);
 			} catch (RemoteException ex) {
-				System.out.println("unabled to contact client "
+				System.out.println("Connection lost: "
 						+ s.getNickname());
-				System.out.println("removing.");
-				// removeSession(tmp);
+				 unsubscribeUser(tmp);
+				 System.out.println(s.getNickname() + "hat den Chat verlassen.");
 				i--; // Da nun alle Clients in Liste einen Platz nach unten
 						// rutschen ...
 			}
@@ -65,7 +66,7 @@ public class ChatServerImpl extends UnicastRemoteObject implements ChatServer {
 		// konfiguriert
 		// werden. Siehe timer.policy in diesem Verzeichnis fuerr Hinweise.
 		try {
-			LocateRegistry.createRegistry (Registry.REGISTRY_PORT);
+			Registry reg = LocateRegistry.getRegistry ();
 			Naming.rebind("ChatServer", new ChatServerImpl());
 		} catch (Exception ex) {
 			ex.printStackTrace();

@@ -30,7 +30,9 @@ public class ChatClient extends JFrame {
 		ChatServer server = (ChatServer) Naming.lookup("ChatServer");
 		handle = new ClientProxyImpl(this);
 		cp = server.subscribeUser(nickname, handle);
-
+		
+		
+		//GUI
 		setTitle(nickname);
 		getContentPane().setLayout(new BorderLayout());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -53,7 +55,7 @@ public class ChatClient extends JFrame {
 			}
 		});
 
-		JButton close = new JButton("close");
+		JButton close = new JButton("Schlieﬂen");
 		getContentPane().add(close, BorderLayout.SOUTH);
 		close.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

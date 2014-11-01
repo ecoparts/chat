@@ -1,6 +1,7 @@
+// repräsentiert den User
+
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.rmi.Naming;
 
 
 public class ChatProxyImpl extends UnicastRemoteObject implements ChatProxy {
@@ -17,7 +18,7 @@ public class ChatProxyImpl extends UnicastRemoteObject implements ChatProxy {
     this.handle = handle;
   }
 
-  public void sendMessage(String message) {
+  public void sendMessage(String message) throws RemoteException {
     server.postMessage(message, this);
   }
 
